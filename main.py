@@ -1,7 +1,7 @@
 import os
 import json
 from abc import ABC, abstractmethod
-path = r"C:\Users\Zinte\source\repos\Course-Manager\Course-Manager\datastorage\data.json"
+path = r".\data.json"
 data = ""
 
 contenderList = []
@@ -67,21 +67,21 @@ class SaveAndQuit(MenuItem):
     def execute(self):
         print("\n--- Wird ausgeführt ---")
         try:
-            WriteData(path, "Contender")
-            for contender in Contender.GetAllContender():
-                print(contender.to_dict())
-                WriteData(path, contender.to_dict())
-            print("\n Teilnehmer wurden erfolgreich gespeichert")
+            if (Contender.GetAllContender):
+                for contender in Contender.GetAllContender():
+                    print(contender.to_dict())
+                    WriteData(path, contender.to_dict())
+                print("\n Teilnehmer wurden erfolgreich gespeichert")
         except Exception as e:
             print("\n Fehler beim Speichern der Teilnehmer")
             print(e)
 
         try:
-            WriteData(path, "Course")
-            for course in Course.GetAllCourses():
-                print(course)
-                WriteData(path, course)
-            print("\n Kurse wurden erfolgreich gespeichert")
+            if (Course.GetAllCourses()):
+                for course in Course.GetAllCourses():
+                    print(course)
+                    WriteData(path, course)
+                print("\n Kurse wurden erfolgreich gespeichert")
         except Exception as e:
             print("\n Fehler beim Speichern der Kurse")
             print(e)
@@ -121,18 +121,31 @@ def DataStorageCheck(path):
         ReadData(path)
     else:
         print("Keine bereitstehende Speicherung von Daten gefunden")
+        WriteData(path, 
+                {
+                    "Contender": [
+
+                    ]
+                })
  
 def ReadData(path):
     data_store = open(path, "r")
     print("Vorhandene Daten:")
-    with data_store as file:
-        line = file.readline()
-        print(line)
+    with open(path) as file:
+        data = json.load(file)
+        if "Contender" in data:
+            contenders = data["Contender"]
+            for contender in contenders:
+                Contender(contender["name"], contender["mail"])
+            for i in Contender.GetAllContender():
+                print(str(i))
+
     data_store.close()
 
 def WriteData(path, data):
-    with open(path, "w") as file:
+    with open(path, "a") as file:
         json.dump(data, file, indent=4)
+        print("\n")
 
 class Contender:
     contenderList = []
@@ -141,10 +154,12 @@ class Contender:
         self.mail = mail
         Contender.contenderList.append(self)
 
-    def to_dict(self):
+    def to_dict(self):  
         return {
-            "name" : self.name,
-            "mail" : self.mail
+            data["Contender"].append({
+                "name" : self.name,
+                "mail" : self.mail
+            })
         }
 
     @classmethod
@@ -173,11 +188,13 @@ class Course:
         self.capacity = capacity
         Course.courseList.append(self)
 
-    def __str__(self):
-        return json.dumps({
-            "title" : self.title,
-            "capacity" : self.capacity
-        }, indent=4)
+    def to_dict(self):
+        return {
+            data["Courses"].append({
+                "title" : self.title,
+                "capacity" : self.capacity
+            })
+        }
     
     @classmethod
     def GetAllCourses(cls):
