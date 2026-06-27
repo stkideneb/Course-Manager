@@ -67,23 +67,9 @@ class SaveAndQuit(MenuItem):
     def execute(self):
         print("\n--- Wird ausgeführt ---")
         try:
-            if (Contender.GetAllContender):
-                for contender in Contender.GetAllContender():
-                    print(contender.to_dict())
-                    WriteData(path, contender.to_dict())
-                print("\n Teilnehmer wurden erfolgreich gespeichert")
+            WriteAllData(path)
         except Exception as e:
-            print("\n Fehler beim Speichern der Teilnehmer")
-            print(e)
-
-        try:
-            if (Course.GetAllCourses()):
-                for course in Course.GetAllCourses():
-                    print(course)
-                    WriteData(path, course)
-                print("\n Kurse wurden erfolgreich gespeichert")
-        except Exception as e:
-            print("\n Fehler beim Speichern der Kurse")
+            print("\n Fehler beim Speichern der Daten")
             print(e)
         print("\n--- Programm wird beendet ---")
         os.abort()
@@ -116,20 +102,18 @@ class ConsoleMenu:
                 print("Option war Invalide. Bitte um Wiederholung")
 
 def DataStorageCheck(path):
-    if os.path.exists(path):
+    if os.path.exists(path) and os.path.getsize(path) > 0:
         print("Eine Datenspeicherung existiert bereits")
         ReadData(path)
     else:
         print("Keine bereitstehende Speicherung von Daten gefunden")
         WriteData(path, 
                 {
-                    "Contender": [
-
-                    ]
+                    "Contender": [],
+                    "Courses": []
                 })
  
 def ReadData(path):
-    data_store = open(path, "r")
     print("Vorhandene Daten:")
     with open(path) as file:
         data = json.load(file)
@@ -138,14 +122,22 @@ def ReadData(path):
             for contender in contenders:
                 Contender(contender["name"], contender["mail"])
             for i in Contender.GetAllContender():
-                print(str(i))
+                print(i)
 
-    data_store.close()
+    file.close()
 
 def WriteData(path, data):
     with open(path, "a") as file:
         json.dump(data, file, indent=4)
         print("\n")
+
+def WriteAllData(path):
+    data = {
+        "Contender": [Contender.to_dict() for Contender in Contender.GetAllContender()],
+        "Courses": [Course.to_dict() for Course in Course.GetAllCourses()]
+    }
+    with open(path, "w") as file:
+        json.dump(data, file, indent=4)
 
 class Contender:
     contenderList = []
@@ -156,11 +148,11 @@ class Contender:
 
     def to_dict(self):  
         return {
-            data["Contender"].append({
-                "name" : self.name,
-                "mail" : self.mail
-            })
+            "name" : self.name,
+            "mail" : self.mail
         }
+    def __str__(self):
+        return f"{self.name} {self.mail}"
 
     @classmethod
     def GetAllContender(cls):

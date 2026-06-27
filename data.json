@@ -1,8 +1,21 @@
 {
-  "Contender": [
-    {
-      "name": "test",
-      "mail": "test"
-    }
-  ]
+    "Contender": [
+        {
+            "name": "",
+            "mail": "test"
+        },
+        {
+            "name": "test",
+            "mail": "test"
+        },
+        {
+            "name": "retard",
+            "mail": "test"
+        },
+        {
+            "name": "test",
+            "mail": "test"
+        }
+    ],
+    "Courses": []
 }
