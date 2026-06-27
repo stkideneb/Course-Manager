@@ -30,7 +30,7 @@ class AddCourse(MenuItem):
         return "Kurs Anleger"
     def execute(self):
         print("\n--- Kurs Erstellung ---")
-        CreateContender()
+        CreateCourse()
 
 class SearchContender(MenuItem):
     @property
@@ -85,7 +85,7 @@ class ConsoleMenu:
         while True:
             print("\n==== Menü ====")
             for key, tool in self._menu_items.items():
-                print(f"{key}{tool.name}")
+                print(f"{str(key) + ". "}{tool.name}")
             print("verlassen [Q]")
             print("=============")
             choice = input("Wählen Sie eine Tätigkeit aus: ").upper()
@@ -110,20 +110,31 @@ def DataStorageCheck(path):
         WriteData(path, 
                 {
                     "Contender": [],
-                    "Courses": []
+                    "Course": []
                 })
  
 def ReadData(path):
+    contenderNumerator = 1
+    courseNumerator = 1
     print("Vorhandene Daten:")
     with open(path) as file:
         data = json.load(file)
         if "Contender" in data:
+            print("----Teilnehmer----")
             contenders = data["Contender"]
             for contender in contenders:
                 Contender(contender["name"], contender["mail"])
-            for i in Contender.GetAllContender():
-                print(i)
-
+            for contender in Contender.GetAllContender():
+                print(str(contenderNumerator) + ".", "Name:", contender.name, "E-Mail:", contender.mail)
+                contenderNumerator+=1
+        if "Course" in data:
+            print("----Kurse----")
+            courses = data["Course"]
+            for course in courses:
+                Course(course["title"], course["capacity"])
+            for course in Course.GetAllCourses():
+                print(str(courseNumerator) + ".", "Title: ", course.title, "Kapazität: ", course.capacity)
+                courseNumerator+=1
     file.close()
 
 def WriteData(path, data):
@@ -134,7 +145,7 @@ def WriteData(path, data):
 def WriteAllData(path):
     data = {
         "Contender": [Contender.to_dict() for Contender in Contender.GetAllContender()],
-        "Courses": [Course.to_dict() for Course in Course.GetAllCourses()]
+        "Course": [Course.to_dict() for Course in Course.GetAllCourses()]
     }
     with open(path, "w") as file:
         json.dump(data, file, indent=4)
@@ -182,11 +193,12 @@ class Course:
 
     def to_dict(self):
         return {
-            data["Courses"].append({
-                "title" : self.title,
-                "capacity" : self.capacity
-            })
+            "title" : self.title,
+            "capacity" : self.capacity
         }
+
+    def __str__(self):
+        return f"{self.title} {self.capacity}"
     
     @classmethod
     def GetAllCourses(cls):

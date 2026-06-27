@@ -17,5 +17,14 @@
             "mail": "test"
         }
     ],
-    "Courses": []
+    "Course": [
+        {
+            "title": "testen",
+            "capacity": "20"
+        },
+        {
+            "title": "aerobix",
+            "capacity": "2"
+        }
+    ]
 }
