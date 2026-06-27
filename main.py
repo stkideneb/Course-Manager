@@ -1,6 +1,8 @@
+from asyncio.windows_events import NULL
 import os
 import json
 from abc import ABC, abstractmethod
+
 path = r".\data.json"
 data = ""
 
@@ -45,17 +47,29 @@ class ShowCourses(MenuItem):
         return "Kurse Anzeigen"
     def execute(self):
         print("\n---Auflistung der Kurse---")
-        courseNumerator = 1
         for course in Course.GetAllCourses():
-            print(str(courseNumerator) + ".", "Title: ", course.title, "Kapazität: ", course.capacity)
-            courseNumerator+=1
+            occupancy = 0;
+            for contender in Contender.GetAllContender():
+                if contender.id in course.contender_ids:
+                    occupancy+=1
+            print(str(course.id) + ".", "Title: " + course.title, "Auslastung: (" + str(occupancy) + "/" + str(course.capacity) + ")")
 
 class PerformBooking(MenuItem):
     @property
     def name(self):
         return "Anmelden"
     def execute(self):
-        print("\n--- Wird ausgeführt ---")
+        print("\n--- Buchungsformular ---")
+        contenderName = input("Bitte geben Sie ihren Namen an: ")
+        selectedCourse = int(input("Bitte geben Sie die Kursnummer an: "))
+        for contender in Contender.GetAllContender():
+            if contenderName == contender.name:
+                selectedContender = contender.id
+                for course in Course.GetAllCourses():
+                    if selectedCourse == course.id:
+                        print(type(course.contender_ids), course.contender_ids)
+                        course.contender_ids.append(selectedContender)
+                        print(type(course.contender_ids), course.contender_ids)
 
 class CancelBooking(MenuItem):
     @property
@@ -118,8 +132,6 @@ def DataStorageCheck(path):
                 })
  
 def ReadData(path):
-    contenderNumerator = 1
-    courseNumerator = 1
     print("Vorhandene Daten:")
     with open(path) as file:
         data = json.load(file)
@@ -129,16 +141,22 @@ def ReadData(path):
             for contender in contenders:
                 Contender(contender["name"], contender["mail"])
             for contender in Contender.GetAllContender():
-                print(str(contenderNumerator) + ".", "Name:", contender.name, "E-Mail:", contender.mail)
-                contenderNumerator+=1
+                print(str(contender.id) + ".", "Name:", contender.name, "E-Mail:", contender.mail)
         if "Course" in data:
             print("----Kurse----")
             courses = data["Course"]
             for course in courses:
-                Course(course["title"], course["capacity"])
+                Course(course["id"], course["title"], course["capacity"], course["contender_ids"], course["waitingList_ids"])
             for course in Course.GetAllCourses():
-                print(str(courseNumerator) + ".", "Title: ", course.title, "Kapazität: ", course.capacity)
-                courseNumerator+=1
+                coursePartitioner = []
+                coursePartitionerCounter = 0
+                for contender in Contender.GetAllContender():
+                    if contender.id in course.contender_ids:
+                        coursePartitioner.append(contender.name)
+                        coursePartitionerCounter+=1
+                if coursePartitioner == NULL:
+                    coursePartitioner = ""
+                print(str(course.id) + ".", "Title: ", course.title, "Kapazität(" + str(coursePartitionerCounter) + "/" + str(course.capacity) + ")", "Teilnehmer: ", coursePartitioner, "Warteliste: ", course.waitingList_ids)
     file.close()
 
 def WriteData(path, data):
@@ -157,17 +175,19 @@ def WriteAllData(path):
 class Contender:
     contenderList = []
     def __init__(self, name, mail):
+        self.id = max(contender.id for contender in Contender.contenderList) + 1 if Contender.contenderList else 1
         self.name = name
         self.mail = mail
         Contender.contenderList.append(self)
 
     def to_dict(self):  
         return {
+            "id" : self.id,
             "name" : self.name,
             "mail" : self.mail
         }
     def __str__(self):
-        return f"{self.name} {self.mail}"
+        return f"{self.id} {self.name} {self.mail}"
 
     @classmethod
     def GetAllContender(cls):
@@ -191,18 +211,32 @@ class Contender:
 class Course:
     courseList = [];
     def __init__(self, title, capacity):
+        self.id = max(course.id for course in Course.courseList) + 1 if Course.courseList else 1
         self.title = title
         self.capacity = capacity
+        self.contender_ids = []
+        self.waitingList_ids = []
+        Course.courseList.append(self)
+
+    def __init__(self, id, title, capacity, contender_ids, waitingList_ids):
+        self.id = id
+        self.title = title
+        self.capacity = capacity
+        self.contender_ids = contender_ids
+        self.waitingList_ids = waitingList_ids
         Course.courseList.append(self)
 
     def to_dict(self):
         return {
+            "id" : self.id,
             "title" : self.title,
-            "capacity" : self.capacity
+            "capacity" : self.capacity,
+            "contender_ids" : self.contender_ids,
+            "waitingList_ids" : self.waitingList_ids
         }
 
     def __str__(self):
-        return f"{self.title} {self.capacity}"
+        return f"{self.id} {self.title} {self.capacity}"
     
     @classmethod
     def GetAllCourses(cls):

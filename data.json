@@ -1,30 +1,33 @@
 {
     "Contender": [
         {
-            "name": "",
-            "mail": "test"
-        },
-        {
+            "id": 1,
             "name": "test",
             "mail": "test"
         },
         {
-            "name": "retard",
-            "mail": "test"
-        },
-        {
-            "name": "test",
+            "id": 2,
+            "name": "stet",
             "mail": "test"
         }
     ],
     "Course": [
         {
-            "title": "testen",
-            "capacity": "20"
+            "id": 1,
+            "title": "Testversuche",
+            "capacity": "10",
+            "contender_ids": [
+                1,
+                2
+            ],
+            "waitingList_ids": []
         },
         {
-            "title": "aerobix",
-            "capacity": "2"
+            "id": 2,
+            "title": "test",
+            "capacity": "8",
+            "contender_ids": [],
+            "waitingList_ids": []
         }
     ]
 }
