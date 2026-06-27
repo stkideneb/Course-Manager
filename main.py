@@ -44,7 +44,11 @@ class ShowCourses(MenuItem):
     def name(self):
         return "Kurse Anzeigen"
     def execute(self):
-        print("\n--- Wird ausgeführt ---")
+        print("\n---Auflistung der Kurse---")
+        courseNumerator = 1
+        for course in Course.GetAllCourses():
+            print(str(courseNumerator) + ".", "Title: ", course.title, "Kapazität: ", course.capacity)
+            courseNumerator+=1
 
 class PerformBooking(MenuItem):
     @property
