@@ -67,9 +67,12 @@ class PerformBooking(MenuItem):
                 selectedContender = contender.id
                 for course in Course.GetAllCourses():
                     if selectedCourse == course.id:
-                        print(type(course.contender_ids), course.contender_ids)
-                        course.contender_ids.append(selectedContender)
-                        print(type(course.contender_ids), course.contender_ids)
+                        if len(course.contender_ids) < int(course.capacity):
+                            print(type(course.contender_ids), course.contender_ids)
+                            course.contender_ids.append(selectedContender)
+                            print(type(course.contender_ids), course.contender_ids)
+                        else:
+                            print("Kurs vollständig ausgelastet")
 
 class CancelBooking(MenuItem):
     @property

@@ -9,13 +9,18 @@
             "id": 2,
             "name": "stet",
             "mail": "test"
+        },
+        {
+            "id": 3,
+            "name": "Benedikt",
+            "mail": "asdasd"
         }
     ],
     "Course": [
         {
             "id": 1,
             "title": "Testversuche",
-            "capacity": "10",
+            "capacity": "2",
             "contender_ids": [
                 1,
                 2
